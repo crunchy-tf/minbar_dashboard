@@ -1,3 +1,4 @@
+// FILE: lib/api.ts
 import { getAuthCredentials } from "./auth"
 
 const API_BASE_URL = "http://34.155.97.220:8080"
@@ -32,21 +33,40 @@ class ApiClient {
         method: "GET",
         headers: this.getAuthHeaders(),
         mode: "cors",
-        credentials: "omit",
+        credentials: "omit", // For Basic Auth, 'omit' is correct if not sending cookies
       })
 
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`)
+        // Try to get more detailed error message from API if available
+        let errorMessage = `API request failed: ${response.status} ${response.statusText}`;
+        try {
+          const errorBody = await response.json();
+          if (errorBody && errorBody.detail) {
+            errorMessage += ` - ${errorBody.detail}`;
+          } else if (errorBody && errorBody.message) {
+            errorMessage += ` - ${errorBody.message}`;
+          }
+        } catch (e) {
+          // Ignore if response body is not JSON or empty
+        }
+        throw new Error(errorMessage)
       }
 
       return response.json()
-    } catch (error) {
+    } catch (error: unknown) { // Explicitly type error as unknown
       console.error(`API Error for ${endpoint}:`, error)
 
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        throw new Error(`CORS_ERROR`)
+      // Type guard to check if error is an instance of Error
+      if (error instanceof Error) {
+        if (error instanceof TypeError && error.message.toLowerCase().includes("failed to fetch")) { // More robust check for fetch failure
+          throw new Error(`CORS_ERROR`) // Or a more generic NetworkError
+        }
+        // Re-throw the original error or a new one with the message
+        throw new Error(error.message);
+      } else {
+        // Handle cases where the thrown value is not an Error instance
+        throw new Error(`An unknown error occurred for endpoint ${endpoint}`);
       }
-      throw error
     }
   }
 }
@@ -126,17 +146,29 @@ const mockData = {
   ],
 }
 
+// Helper function for error handling in API calls
+function handleApiError(error: unknown, fallbackData: any, contextMessage: string) {
+  console.warn(contextMessage, error instanceof Error ? error.message : String(error));
+  if (error instanceof Error && error.message === "CORS_ERROR") {
+    // Specific handling for CORS_ERROR if needed, though usually it implies unavailability
+    // For now, it will fall through to returning mock data.
+    // You might want to display a specific CORS error message to the user.
+  }
+  return fallbackData;
+}
+
+
 // API functions with fallback to mock data
 export const api = {
   // Health check
   health: async () => {
     try {
       return await apiClient.get("/health")
-    } catch (error) {
-      if (error.message === "CORS_ERROR") {
+    } catch (error: unknown) { // Type error as unknown
+      if (error instanceof Error && error.message === "CORS_ERROR") {
         return { status: "cors_error", message: "CORS restrictions prevent API access" }
       }
-      return { status: "unavailable", message: "API server unreachable" }
+      return { status: "unavailable", message: error instanceof Error ? error.message : "API server unreachable" }
     }
   },
 
@@ -144,8 +176,8 @@ export const api = {
   root: async () => {
     try {
       return await apiClient.get("/")
-    } catch (error) {
-      return { message: "Welcome to Minbar API Gateway (Demo Mode)" }
+    } catch (error: unknown) { // Type error as unknown
+      return { message: error instanceof Error ? error.message : "Welcome to Minbar API Gateway (Demo Mode)" }
     }
   },
 
@@ -153,9 +185,8 @@ export const api = {
   overview: async (daysPast = 7) => {
     try {
       return await apiClient.get("/signals/overview", { days_past: daysPast })
-    } catch (error) {
-      console.warn("Using mock overview data due to API error:", error.message)
-      return mockData.overview
+    } catch (error: unknown) { // Type error as unknown
+      return handleApiError(error, mockData.overview, "Using mock overview data due to API error:");
     }
   },
 
@@ -167,9 +198,8 @@ export const api = {
         min_doc_count: minDocCount,
         days_past: daysPast,
       })
-    } catch (error) {
-      console.warn("Using mock topics data due to API error:", error.message)
-      return mockData.topics.slice(0, limit)
+    } catch (error: unknown) { // Type error as unknown
+      return handleApiError(error, mockData.topics.slice(0, limit), "Using mock topics data due to API error:");
     }
   },
 
@@ -180,9 +210,8 @@ export const api = {
         end_time: endTime,
         time_aggregation: timeAggregation,
       })
-    } catch (error) {
-      console.warn("Using mock trend data due to API error:", error.message)
-      return {
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = {
         topic_id: topicId,
         topic_name: `Topic ${topicId}`,
         trend_data: [
@@ -192,7 +221,8 @@ export const api = {
           { timestamp: "2025-05-20T13:00:00Z", value: 20.0 },
           { timestamp: "2025-05-20T14:00:00Z", value: 22.0 },
         ],
-      }
+      };
+      return handleApiError(error, fallback, "Using mock trend data due to API error:");
     }
   },
 
@@ -203,13 +233,13 @@ export const api = {
         end_time: endTime,
         time_aggregation: timeAggregation,
       })
-    } catch (error) {
-      console.warn("Using mock sentiment data due to API error:", error.message)
-      return {
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = {
         topic_id: topicId,
         topic_name: `Topic ${topicId}`,
         sentiments: [{ label: "Concerned", count: 123 }],
-      }
+      };
+      return handleApiError(error, fallback, "Using mock sentiment data due to API error:");
     }
   },
 
@@ -227,16 +257,16 @@ export const api = {
         time_aggregation: timeAggregation,
         limit,
       })
-    } catch (error) {
-      console.warn("Using mock keywords data due to API error:", error.message)
-      return {
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = {
         topic_id: topicId,
         topic_name: `Topic ${topicId}`,
         keywords: [
           { keyword: "trust science", frequency: 20 },
           { keyword: "conspiracy", frequency: 18 },
         ],
-      }
+      };
+      return handleApiError(error, fallback, "Using mock keywords data due to API error:");
     }
   },
 
@@ -249,9 +279,8 @@ export const api = {
         time_aggregation: timeAggregation,
         sentiment_labels: sentimentLabels,
       })
-    } catch (error) {
-      console.warn("Using mock sentiment trends due to API error:", error.message)
-      return [
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = [
         {
           sentiment_label: "Concerned",
           trend_data: [
@@ -260,7 +289,8 @@ export const api = {
             { timestamp: "2025-05-20T11:00:00Z", value: 0.41 },
           ],
         },
-      ]
+      ];
+      return handleApiError(error, fallback, "Using mock sentiment trends due to API error:");
     }
   },
 
@@ -280,12 +310,12 @@ export const api = {
         rank_by: rankBy,
         limit,
       })
-    } catch (error) {
-      console.warn("Using mock rankings due to API error:", error.message)
-      return [
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = [
         { name: "Vaccine Hesitancy Side Effects Rumors", id: "3", score: 0.56 },
         { name: "Air Quality Respiratory Issues Alert", id: "604", score: 0.55 },
-      ]
+      ];
+      return handleApiError(error, fallback, "Using mock rankings due to API error:");
     }
   },
 
@@ -293,9 +323,8 @@ export const api = {
   topManagedKeywords: async (lang = "en", limit = 20) => {
     try {
       return await apiClient.get("/keywords/top_managed", { lang, limit })
-    } catch (error) {
-      console.warn("Using mock keywords due to API error:", error.message)
-      return mockData.keywords.slice(0, limit)
+    } catch (error: unknown) { // Type error as unknown
+      return handleApiError(error, mockData.keywords.slice(0, limit), "Using mock keywords due to API error:");
     }
   },
 
@@ -307,9 +336,8 @@ export const api = {
         end_time: endTime,
         latest_only: latestOnly,
       })
-    } catch (error) {
-      console.warn("Using mock basic stats due to API error:", error.message)
-      return {
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = {
         count: 7,
         sum_val: 123.0,
         mean: 17.57,
@@ -318,7 +346,8 @@ export const api = {
         max_val: 22.0,
         std_dev: 3.29,
         variance: 10.85,
-      }
+      };
+      return handleApiError(error, fallback, "Using mock basic stats due to API error:");
     }
   },
 
@@ -329,9 +358,8 @@ export const api = {
         end_time: endTime,
         latest_only: latestOnly,
       })
-    } catch (error) {
-      console.warn("Using mock moving average due to API error:", error.message)
-      return {
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = {
         points: [
           { timestamp: "2025-05-20T12:00:00Z", value: 15.0 },
           { timestamp: "2025-05-20T13:00:00Z", value: 16.67 },
@@ -339,7 +367,8 @@ export const api = {
         ],
         window: 3,
         type: "simple",
-      }
+      };
+      return handleApiError(error, fallback, "Using mock moving average due to API error:");
     }
   },
 
@@ -350,14 +379,14 @@ export const api = {
         end_time: endTime,
         latest_only: latestOnly,
       })
-    } catch (error) {
-      console.warn("Using mock z-score due to API error:", error.message)
-      return {
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = {
         points: [
           { timestamp: "2025-05-20T10:00:00Z", original_value: 15.0, z_score: -0.78 },
           { timestamp: "2025-05-20T11:00:00Z", original_value: 18.0, z_score: 0.13 },
         ],
-      }
+      };
+      return handleApiError(error, fallback, "Using mock z-score due to API error:");
     }
   },
 
@@ -368,15 +397,15 @@ export const api = {
         end_time: endTime,
         latest_only: latestOnly,
       })
-    } catch (error) {
-      console.warn("Using mock rate of change due to API error:", error.message)
-      return {
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = {
         signal_name: signalName,
         points: [
           { timestamp: "2025-05-20T11:00:00Z", value: 3.0 },
           { timestamp: "2025-05-20T12:00:00Z", value: -6.0 },
         ],
-      }
+      };
+      return handleApiError(error, fallback, "Using mock rate of change due to API error:");
     }
   },
 
@@ -387,15 +416,15 @@ export const api = {
         end_time: endTime,
         latest_only: latestOnly,
       })
-    } catch (error) {
-      console.warn("Using mock percent change due to API error:", error.message)
-      return {
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = {
         signal_name: signalName,
         points: [
           { timestamp: "2025-05-20T11:00:00Z", value: 20.0 },
           { timestamp: "2025-05-20T12:00:00Z", value: -33.33 },
         ],
-      }
+      };
+      return handleApiError(error, fallback, "Using mock percent change due to API error:");
     }
   },
 
@@ -406,14 +435,14 @@ export const api = {
         end_time: endTime,
         latest_only: latestOnly,
       })
-    } catch (error) {
-      console.warn("Using mock STL decomposition due to API error:", error.message)
-      return {
+    } catch (error: unknown) { // Type error as unknown
+      const fallback = {
         trend: [{ timestamp: "2025-05-20T10:00:00Z", value: 15.5 }],
         seasonal: [{ timestamp: "2025-05-20T10:00:00Z", value: -0.2 }],
         residual: [{ timestamp: "2025-05-20T10:00:00Z", value: -0.3 }],
         period_used: 3,
-      }
+      };
+      return handleApiError(error, fallback, "Using mock STL decomposition due to API error:");
     }
   },
 }

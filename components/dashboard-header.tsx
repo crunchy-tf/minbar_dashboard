@@ -57,16 +57,6 @@ export function DashboardHeader() {
                   <p className="text-xs leading-none text-muted-foreground">admin@minbar.health</p>
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-border" />
-              <DropdownMenuItem className="cursor-pointer text-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-                <User className="mr-3 h-4 w-4" />
-                <span>Profile Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer text-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-                <Settings className="mr-3 h-4 w-4" />
-                <span>System Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem
                 onClick={handleLogout}
                 className="cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-700 dark:hover:text-red-300 transition-colors"

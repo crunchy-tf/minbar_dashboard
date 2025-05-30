@@ -1,3 +1,4 @@
+// app\dashboard\page.tsx
 "use client"
 
 import type React from "react"
@@ -159,12 +160,13 @@ export function AdvancedOverview() {
 
         // Enhanced sentiment data
         setSentimentData([
-          { name: "Concerned", value: 32, color: SENTIMENT_COLORS.Concerned },
-          { name: "Satisfied", value: 28, color: SENTIMENT_COLORS.Satisfied },
-          { name: "Anxious", value: 18, color: SENTIMENT_COLORS.Anxious },
-          { name: "Neutral", value: 15, color: SENTIMENT_COLORS.Neutral },
-          { name: "Angry", value: 7, color: SENTIMENT_COLORS.Angry },
-        ])
+  { name: "Concerned", value: 24.5, color: SENTIMENT_COLORS.Concerned },
+  { name: "Anxious", value: 19.4, color: SENTIMENT_COLORS.Anxious },
+  { name: "Satisfied", value: 11.8, color: SENTIMENT_COLORS.Satisfied },
+  { name: "Angry", value: 8.9, color: SENTIMENT_COLORS.Angry },
+  { name: "Neutral", value: 8.9, color: SENTIMENT_COLORS.Neutral }, // Value you requested
+  { name: "Grateful", value: 18.7, color: SENTIMENT_COLORS.Grateful },
+])
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error)
         setError("Failed to load dashboard data")
