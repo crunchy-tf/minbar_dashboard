@@ -3,30 +3,20 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-// import { Button } from "@/components/ui/button"; // Will be removed if no other buttons remain
 import { Badge } from "@/components/ui/badge"
-// import { Input } from "@/components/ui/input"; // No longer needed for Generate tab
-// import { Label } from "@/components/ui/label"; // No longer needed for Generate tab
-// import { Textarea } from "@/components/ui/textarea"; // No longer needed for Generate tab
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // No longer needed for Generate tab
-// import { Checkbox } from "@/components/ui/checkbox"; // No longer needed for Generate tab
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-// import { DatePickerWithRange } from "@/components/date-range-picker"; // No longer needed for Generate tab
-// import type { DateRange } from "react-day-picker"; // No longer needed for Generate tab
-// import { subDays, format } from "date-fns"; // subDays no longer needed
-import { format } from "date-fns"; // format is still used
+import { format, subDays, subWeeks, subMonths } from "date-fns"; 
 import { 
   FileText, 
-  Download, 
+  // Download, // Download icon might still be used for the action button, or removed if that button is also removed
   Share, 
   Clock, 
   Users, 
   CheckCircle, 
   Eye, 
-  // Edit, // No longer needed for Edit Report button
-  // Plus // No longer needed for New Report button
 } from "lucide-react"
 
+// Removed downloadCount and size from interface
 interface Report {
   id: string
   title: string
@@ -38,83 +28,168 @@ interface Report {
   author: string
   sections: string[]
   recipients: string[]
-  downloadCount: number
-  size: string
+  // downloadCount: number; // Removed
+  // size: string; // Removed
+  tags?: string[]
 }
 
 export default function ReportsPage() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null)
-  // State related to generating reports is no longer needed
-  // const [reportType, setReportType] = useState<string>("executive")
-  // const [dateRange, setDateRange] = useState<DateRange | undefined>({
-  //   from: subDays(new Date(), 7),
-  //   to: new Date(),
-  // })
-  // const [selectedSections, setSelectedSections] = useState<string[]>([])
+  const now = new Date();
 
-  // Mock reports data
   const reports: Report[] = [
     {
       id: "RPT-001",
-      title: "Weekly Health Monitoring Summary",
-      description: "Comprehensive overview of health monitoring activities and key findings for the past week.",
+      title: "Weekly Health Monitoring Summary - W23",
+      description: "Comprehensive overview of health monitoring activities, key signal changes, and emerging topics for week 23.",
       type: "executive",
       status: "published",
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      author: "Dr. Sarah Johnson",
-      sections: ["Executive Summary", "Key Metrics", "Alert Analysis", "Recommendations"],
-      recipients: ["Health Department", "Emergency Response", "Public Affairs"],
-      downloadCount: 47,
-      size: "2.3 MB",
+      createdAt: subWeeks(now, 1),
+      updatedAt: subDays(now, 3),
+      author: "Dr. Anya Sharma",
+      sections: ["Executive Summary", "Key Performance Indicators", "Significant Alerts Review", "Topic Trends Overview", "Forward Outlook & Recommendations"],
+      recipients: ["Health Commissioner", "Mayor's Office", "Department Heads"],
+      // downloadCount: 132, // Removed
+      // size: "1.8 MB", // Removed
+      tags: ["weekly", "summary", "executive_brief"]
     },
     {
       id: "RPT-002",
-      title: "Mental Health Crisis Analysis",
-      description: "In-depth analysis of mental health trends and crisis indicators across monitored regions.",
+      title: "Deep Dive: Mental Health Trends Q2 2025",
+      description: "In-depth statistical analysis of mental health-related signals, sentiment shifts, and demographic correlations for the second quarter.",
       type: "technical",
       status: "published",
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      author: "Mental Health Analytics Team",
-      sections: ["Data Analysis", "Trend Identification", "Risk Assessment", "Intervention Strategies"],
-      recipients: ["Mental Health Services", "Research Teams", "Policy Makers"],
-      downloadCount: 23,
-      size: "4.7 MB",
+      createdAt: subMonths(now, 1),
+      updatedAt: subWeeks(now, 1),
+      author: "Mental Health Analytics Unit",
+      sections: ["Introduction & Methodology", "Data Sources & Cleaning", "Trend Analysis (Anxiety, Depression, Stress)", "Sentiment Analysis of Online Discussions", "Geospatial Hotspot Identification", "Correlation with Socioeconomic Factors", "Limitations", "Conclusion & Further Research"],
+      recipients: ["Research Division", "Mental Health Services Directorate", "Policy Advisors"],
+      // downloadCount: 78, // Removed
+      // size: "5.2 MB", // Removed
+      tags: ["mental_health", "quarterly", "research", "deep_dive"]
     },
     {
       id: "RPT-003",
-      title: "Public Health Communication Brief",
-      description: "Public-facing summary of current health status and recommended actions for citizens.",
+      title: "Public Health Advisory: Increased Flu Activity",
+      description: "Public-facing communication brief regarding the recent surge in influenza cases and recommended preventive measures.",
       type: "public",
-      status: "draft",
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
-      author: "Communications Team",
-      sections: ["Current Status", "Safety Guidelines", "Resources", "FAQ"],
-      recipients: ["Public", "Media Outlets", "Community Leaders"],
-      downloadCount: 0,
-      size: "1.2 MB",
+      status: "published",
+      createdAt: subDays(now, 5),
+      updatedAt: subDays(now, 4),
+      author: "Public Health Communications Office",
+      sections: ["Current Flu Situation", "Symptoms to Watch For", "Prevention Tips (Vaccination, Hygiene)", "When to Seek Medical Care", "Local Testing & Treatment Resources"],
+      recipients: ["General Public (via website, media)", "Community Health Centers", "Schools"],
+      // downloadCount: 1250, // Removed
+      // size: "0.8 MB", // Removed
+      tags: ["public_advisory", "influenza", "seasonal"]
     },
     {
       id: "RPT-004",
-      title: "Regulatory Compliance Report",
-      description: "Quarterly compliance report for health monitoring and surveillance activities.",
+      title: "Annual Regulatory Compliance Statement 2024",
+      description: "Annual report detailing adherence to data privacy (HIPAA, GDPR equivalent), security protocols, and ethical guidelines in health monitoring operations.",
       type: "regulatory",
-      status: "scheduled",
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      author: "Compliance Office",
-      sections: ["Compliance Overview", "Data Governance", "Privacy Measures", "Audit Results"],
-      recipients: ["Regulatory Bodies", "Legal Department", "Executive Leadership"],
-      downloadCount: 12,
-      size: "3.1 MB",
+      status: "archived",
+      createdAt: subMonths(now, 5), 
+      updatedAt: subMonths(now, 4),
+      author: "Chief Compliance Officer",
+      sections: ["Introduction", "Data Governance Framework", "Privacy Impact Assessments Summary", "Security Audit Findings & Remediation", "Ethical Review Board Activities", "Incident Reporting Summary", "Compliance Attestation"],
+      recipients: ["Regulatory Oversight Board", "Internal Audit Committee", "Legal Department"],
+      // downloadCount: 45, // Removed
+      // size: "3.1 MB", // Removed
+      tags: ["compliance", "annual", "data_privacy", "security"]
     },
-  ]
+    {
+      id: "RPT-005",
+      title: "Vaccine Hesitancy Intervention Impact Assessment - Phase 1",
+      description: "Evaluation of the initial phase of the targeted campaign to address vaccine hesitancy in specific demographics.",
+      type: "technical",
+      status: "draft",
+      createdAt: subDays(now, 10),
+      updatedAt: subDays(now, 2),
+      author: "Behavioral Insights Team",
+      sections: ["Background & Objectives", "Methodology (Pre/Post Analysis)", "Campaign Reach & Engagement", "Sentiment Shift Analysis", "Reported Uptake Changes (Preliminary)", "Challenges & Lessons Learned", "Recommendations for Phase 2"],
+      recipients: ["Vaccination Program Lead", "Communications Strategy Group"],
+      // downloadCount: 5, // Removed
+      // size: "2.9 MB", // Removed
+      tags: ["vaccine_hesitancy", "campaign_evaluation", "draft"]
+    },
+    {
+      id: "RPT-006",
+      title: "Environmental Health Risk Profile: Industrial Zone Alpha",
+      description: "Detailed risk assessment concerning air and water quality in the Industrial Zone Alpha, including potential health impacts on nearby residential areas.",
+      type: "executive",
+      status: "published",
+      createdAt: subWeeks(now, 3),
+      updatedAt: subWeeks(now, 2),
+      author: "Environmental Health Task Force",
+      sections: ["Executive Summary", "Pollutant Source Identification", "Exposure Pathway Analysis", "Health Impact Projections", "Community Feedback Summary", "Mitigation Options & Costs"],
+      recipients: ["City Council", "Environmental Protection Agency Liaison", "Community Representatives"],
+      // downloadCount: 92, // Removed
+      // size: "4.5 MB", // Removed
+      tags: ["environmental", "risk_assessment", "industrial_zone"]
+    },
+    {
+      id: "RPT-007",
+      title: "Monthly Emerging Threats Briefing - May 2025",
+      description: "Summary of newly identified or escalating public health threats based on multi-source intelligence gathering.",
+      type: "executive",
+      status: "scheduled", 
+      createdAt: subDays(now, 1), 
+      updatedAt: now, 
+      author: "Horizon Scanning Unit",
+      sections: ["Key Emerging Signals", "Potential Pathogen Watchlist", "Geopolitical Health Risks", "Misinformation Hot Topics", "Early Warning Indicators"],
+      recipients: ["Strategic Health Command", "Emergency Preparedness Committee"],
+      // downloadCount: 0, // Removed
+      // size: "1.1 MB", // Removed
+      tags: ["emerging_threats", "monthly", "intelligence_brief"]
+    },
+    {
+      id: "RPT-008",
+      title: "AI Model Performance & Validation Report - Q1 2025",
+      description: "Technical report on the performance, accuracy, and validation metrics for core AI models used in the health monitoring platform.",
+      type: "technical",
+      status: "published",
+      createdAt: subMonths(now, 2),
+      updatedAt: subMonths(now, 1),
+      author: "AI & Data Science Team",
+      sections: ["Introduction to Monitored Models", "Validation Datasets & Methodology", "Performance Metrics (Accuracy, Precision, Recall, F1)", "Bias & Fairness Assessment", "Drift Detection & Retraining Schedule", "Computational Resource Usage"],
+      recipients: ["Chief Technology Officer", "AI Ethics Board", "Development Teams"],
+      // downloadCount: 33, // Removed
+      // size: "6.8 MB", // Removed
+      tags: ["ai_model", "performance", "validation", "quarterly"]
+    },
+    {
+      id: "RPT-009",
+      title: "Community Health Needs Assessment Summary (2024)",
+      description: "A high-level summary of the comprehensive Community Health Needs Assessment (CHNA) conducted across all districts.",
+      type: "public",
+      status: "archived",
+      createdAt: subMonths(now, 6),
+      updatedAt: subMonths(now, 5),
+      author: "Community Health Planning Dept.",
+      sections: ["Overview of CHNA Process", "Top 5 Identified Health Needs", "Disparities Highlighted", "Available Community Assets", "Next Steps for Action Planning"],
+      recipients: ["Public Libraries", "Community Non-Profits", "Local Government Archives"],
+      // downloadCount: 215, // Removed
+      // size: "2.0 MB", // Removed
+      tags: ["chna", "community_health", "annual", "archived_summary"]
+    },
+    {
+      id: "RPT-010",
+      title: "Special Report: Impact of Social Media on Youth Mental Health",
+      description: "An investigative report exploring the correlation between social media usage patterns and mental well-being indicators among adolescents.",
+      type: "technical",
+      status: "draft",
+      createdAt: subWeeks(now, 2),
+      updatedAt: subDays(now, 1),
+      author: "Dr. E. Vance & Youth Health Research Group",
+      sections: ["Literature Review", "Methodology: Social Media Data Analysis & Surveys", "Key Findings: Usage vs. Anxiety/Depression Scores", "Sentiment Analysis of Youth Online Discussions", "Case Studies", "Ethical Considerations", "Policy Recommendations"],
+      recipients: ["Child & Adolescent Psychiatry Dept.", "School Board Liaisons", "Parent-Teacher Associations"],
+      // downloadCount: 2, // Removed
+      // size: "3.5 MB", // Removed
+      tags: ["youth_mental_health", "social_media", "research", "draft"]
+    }
+  ];
 
-  // availableSections and reportTemplates are no longer needed as Generate/Templates tabs are removed
-  // const availableSections = [...]
-  // const reportTemplates = [...]
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -125,7 +200,7 @@ export default function ReportsPage() {
       case "scheduled":
         return "default"
       case "archived":
-        return "secondary" // Consider if 'archived' should have a different color
+        return "secondary" 
       default:
         return "outline"
     }
@@ -146,11 +221,12 @@ export default function ReportsPage() {
     }
   }
 
+  // Adjusted reportStats to remove totalDownloads
   const reportStats = {
     total: reports.length,
     published: reports.filter((r) => r.status === "published").length,
     drafts: reports.filter((r) => r.status === "draft").length,
-    totalDownloads: reports.reduce((sum, r) => sum + r.downloadCount, 0),
+    // totalDownloads: reports.reduce((sum, r) => sum + r.downloadCount, 0), // Removed
   }
 
   return (
@@ -158,18 +234,12 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Reports & Analytics</h1>
-          <p className="text-muted-foreground">Browse and manage health monitoring reports</p> {/* Updated description */}
+          <p className="text-muted-foreground">Browse and manage health monitoring reports</p>
         </div>
-        {/* Removed New Report Button 
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          New Report
-        </Button>
-        */}
       </div>
 
-      {/* Report Statistics */}
-      <div className="grid gap-4 md:grid-cols-4">
+      {/* Report Statistics - Changed to 3 columns, removed Downloads card */}
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
@@ -195,7 +265,7 @@ export default function ReportsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <FileText className="h-4 w-4 text-orange-500" /> {/* Changed icon from Edit to FileText for drafts */}
+              <FileText className="h-4 w-4 text-orange-500" />
               <div>
                 <p className="text-2xl font-bold">{reportStats.drafts}</p>
                 <p className="text-xs text-muted-foreground">Drafts</p>
@@ -203,31 +273,30 @@ export default function ReportsPage() {
             </div>
           </CardContent>
         </Card>
+        {/* Removed Downloads Stat Card
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <Download className="h-4 w-4 text-purple-500" />
               <div>
-                <p className="text-2xl font-bold">{reportStats.totalDownloads}</p>
+                <p className="text-2xl font-bold">{reportStats.totalDownloads.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">Downloads</p>
               </div>
             </div>
           </CardContent>
         </Card>
+        */}
       </div>
 
-      <Tabs defaultValue="browse" className="space-y-4"> {/* Changed defaultValue */}
-        {/* Changed grid-cols-3 to grid-cols-1 */}
+      <Tabs defaultValue="browse" className="space-y-4">
         <TabsList className="grid w-full grid-cols-1">
-          <TabsTrigger value="browse">Browse Reports</TabsTrigger> {/* Renamed and only tab now */}
-          {/* Removed TabsTrigger for "generate" and "templates" */}
+          <TabsTrigger value="browse">Browse Reports</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="browse" className="space-y-6"> {/* Changed value to "browse" */}
+        <TabsContent value="browse" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-3">
-            {/* Reports List */}
-            <div className="md:col-span-2 space-y-4">
-              {reports.map((report) => (
+            <div className="md:col-span-2 space-y-4  max-h-[calc(100vh-250px)] overflow-y-auto pr-2">
+              {reports.sort((a,b) => b.updatedAt.getTime() - a.updatedAt.getTime()).map((report) => (
                 <Card
                   key={report.id}
                   className={`cursor-pointer transition-all hover:shadow-md ${
@@ -241,113 +310,90 @@ export default function ReportsPage() {
                         <Badge variant={getTypeColor(report.type)}>{report.type}</Badge>
                         <Badge variant={getStatusColor(report.status)}>{report.status}</Badge>
                       </div>
-                      {/* Keeping View and Download for list items, Share can be optional */}
                       <div className="flex items-center space-x-2"> 
-                        <Eye className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); /* Implement view logic or select */ setSelectedReport(report); }} />
-                        <Download className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); alert(`Downloading ${report.title}`); }}/>
-                        <Share className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); alert(`Sharing ${report.title}`); }}/>
+                        <Eye className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); setSelectedReport(report); }} />
+                        {/* Download button in list can remain as a generic action, or be removed if desired */}
+                        {/* <Download className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); alert(`Simulating download for: ${report.title}`); }}/> */}
+                        <Share className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); alert(`Sharing report: ${report.title}`); }}/>
                       </div>
                     </div>
 
-                    <h3 className="font-medium mb-2 leading-tight">{report.title}</h3>
+                    <h3 className="font-medium mb-1 leading-tight">{report.title}</h3>
+                    <p className="text-xs text-muted-foreground mb-2">By: {report.author} | Updated: {format(report.updatedAt, "MMM dd, yyyy")}</p>
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{report.description}</p>
+                    
+                    {report.tags && report.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-3">
+                            {report.tags.map(tag => <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>)}
+                        </div>
+                    )}
 
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-1">
                           <Users className="h-3 w-3" />
-                          <span>{report.author}</span>
+                          <span>{report.recipients.length} Recipients</span>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <Clock className="h-3 w-3" />
-                          <span>{format(report.updatedAt, "MMM dd")}</span>
-                        </div>
+                        {/* Removed Downloads display from list item
                         <div className="flex items-center space-x-1">
                           <Download className="h-3 w-3" />
-                          <span>{report.downloadCount}</span>
+                          <span>{report.downloadCount} Downloads</span>
                         </div>
+                        */}
                       </div>
-                      <span>{report.size}</span>
+                      {/* Removed Size display from list item */}
+                      {/* <span>{report.size}</span> */}
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
 
-            {/* Report Details */}
             <div className="space-y-4">
               {selectedReport ? (
-                <Card>
+                <Card className="sticky top-4">
                   <CardHeader>
-                    <CardTitle>Report Details</CardTitle>
+                    <CardTitle>{selectedReport.title}</CardTitle>
+                    <CardDescription>
+                        Type: <Badge variant={getTypeColor(selectedReport.type)} className="mr-2">{selectedReport.type}</Badge>
+                        Status: <Badge variant={getStatusColor(selectedReport.status)}>{selectedReport.status}</Badge>
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3 text-sm max-h-[calc(100vh-200px)] overflow-y-auto">
+                    <p><span className="font-medium">Description:</span> {selectedReport.description}</p>
+                    <p><span className="font-medium">Author:</span> {selectedReport.author}</p>
+                    <p><span className="font-medium">Created:</span> {format(selectedReport.createdAt, "MMM dd, yyyy HH:mm")}</p>
+                    <p><span className="font-medium">Last Updated:</span> {format(selectedReport.updatedAt, "MMM dd, yyyy HH:mm")}</p>
+                    {/* Removed Size and Downloads from details
+                    <p><span className="font-medium">Size:</span> {selectedReport.size}</p>
+                    <p><span className="font-medium">Downloads:</span> {selectedReport.downloadCount.toLocaleString()}</p>
+                    */}
+                    
                     <div>
-                      <h4 className="font-medium mb-2">{selectedReport.title}</h4>
-                      <p className="text-sm text-muted-foreground">{selectedReport.description}</p>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-sm font-medium">Type:</span>
-                        <Badge variant={getTypeColor(selectedReport.type)}>{selectedReport.type}</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm font-medium">Status:</span>
-                        <Badge variant={getStatusColor(selectedReport.status)}>{selectedReport.status}</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm font-medium">Author:</span>
-                        <span className="text-sm">{selectedReport.author}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm font-medium">Size:</span>
-                        <span className="text-sm">{selectedReport.size}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm font-medium">Downloads:</span>
-                        <span className="text-sm">{selectedReport.downloadCount}</span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h5 className="text-sm font-medium mb-2">Sections:</h5>
-                      <div className="space-y-1">
+                      <h5 className="font-medium mb-1">Sections:</h5>
+                      <ul className="list-disc list-inside pl-4 space-y-0.5">
                         {selectedReport.sections.map((section, index) => (
-                          <div key={index} className="text-sm text-muted-foreground">
-                            {index + 1}. {section}
-                          </div>
+                          <li key={index} className="text-muted-foreground">{section}</li>
                         ))}
-                      </div>
+                      </ul>
                     </div>
 
                     <div>
-                      <h5 className="text-sm font-medium mb-2">Recipients:</h5>
+                      <h5 className="font-medium mb-1">Recipients:</h5>
                       <div className="flex flex-wrap gap-1">
                         {selectedReport.recipients.map((recipient, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {recipient}
-                          </Badge>
+                          <Badge key={index} variant="outline" className="text-xs">{recipient}</Badge>
                         ))}
                       </div>
                     </div>
-
-                    {/* Removed action buttons from details panel
-                    <div className="space-y-2 pt-4 border-t">
-                      <Button className="w-full" size="sm">
-                        <Download className="h-4 w-4 mr-2" />
-                        Download PDF
-                      </Button>
-                      <Button variant="outline" className="w-full" size="sm">
-                        <Share className="h-4 w-4 mr-2" />
-                        Share Report
-                      </Button>
-                      <Button variant="outline" className="w-full" size="sm">
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit Report
-                      </Button>
-                    </div>
-                    */}
+                     {selectedReport.tags && selectedReport.tags.length > 0 && (
+                        <div>
+                            <h5 className="font-medium mb-1">Tags:</h5>
+                            <div className="flex flex-wrap gap-1">
+                                {selectedReport.tags.map(tag => <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>)}
+                            </div>
+                        </div>
+                    )}
                   </CardContent>
                 </Card>
               ) : (
@@ -355,16 +401,13 @@ export default function ReportsPage() {
                   <CardContent className="p-8 text-center">
                     <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
                     <h3 className="text-lg font-medium mb-2">Select a Report</h3>
-                    <p className="text-muted-foreground">Click on a report to view details and actions.</p>
+                    <p className="text-muted-foreground">Click on a report from the list to view its details.</p>
                   </CardContent>
                 </Card>
               )}
             </div>
           </div>
         </TabsContent>
-
-        {/* Removed TabsContent for "generate" and "templates" */}
-
       </Tabs>
     </div>
   )

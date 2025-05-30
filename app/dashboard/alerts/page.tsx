@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-// import { Button } from "@/components/ui/button"; // Button import will be removed if no other buttons remain
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -14,14 +13,10 @@ import {
   Clock,
   Filter,
   Search,
-  // Eye, // Removed as "View Full" button is removed
-  // Archive, // Removed as Actions buttons are removed
-  // Trash2, // Removed as Actions buttons are removed
-  // Settings, // Removed as "Alert Settings" button is removed
   Users,
   MapPin,
 } from "lucide-react"
-import { format, formatDistanceToNow } from "date-fns"
+import { format, formatDistanceToNow, subHours, subDays, subMinutes } from "date-fns"
 
 interface AlertItem {
   id: string
@@ -49,19 +44,19 @@ export default function AlertsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
   const [selectedAlert, setSelectedAlert] = useState<AlertItem | null>(null)
 
-  // Mock alerts data
+  // Expanded Mock alerts data
   useEffect(() => {
+    const now = new Date();
     const mockAlerts: AlertItem[] = [
       {
         id: "ALT-001",
         title: "Hospital Capacity Critical Threshold Exceeded",
-        description:
-          "Multiple hospitals in the metropolitan area are reporting bed occupancy rates above 95%. Emergency departments experiencing significant delays.",
+        description: "Multiple hospitals in the metropolitan area are reporting bed occupancy rates above 95%. Emergency departments experiencing significant delays.",
         severity: "critical",
         category: "Healthcare Infrastructure",
         status: "active",
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-        updatedAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+        createdAt: subHours(now, 2),
+        updatedAt: subMinutes(now, 30),
         source: "Hospital Management System",
         location: "Metropolitan Area",
         affectedPopulation: 2500000,
@@ -72,13 +67,12 @@ export default function AlertsPage() {
       {
         id: "ALT-002",
         title: "Unusual Spike in Mental Health Discussions",
-        description:
-          "Social media monitoring detected a 340% increase in mental health-related posts with concerning sentiment patterns.",
+        description: "Social media monitoring detected a 340% increase in mental health-related posts with concerning sentiment patterns.",
         severity: "high",
         category: "Mental Health",
         status: "acknowledged",
-        createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-        updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
+        createdAt: subHours(now, 4),
+        updatedAt: subHours(now, 1),
         source: "Social Media Monitor",
         location: "National",
         affectedPopulation: 50000,
@@ -89,13 +83,12 @@ export default function AlertsPage() {
       {
         id: "ALT-003",
         title: "Vaccine Misinformation Campaign Detected",
-        description:
-          "Coordinated spread of vaccine misinformation detected across multiple platforms. Potential impact on vaccination rates.",
+        description: "Coordinated spread of vaccine misinformation detected across multiple platforms. Potential impact on vaccination rates.",
         severity: "high",
         category: "Misinformation",
         status: "active",
-        createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-        updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        createdAt: subHours(now, 6),
+        updatedAt: subHours(now, 2),
         source: "Misinformation Detection AI",
         location: "Multi-Regional",
         affectedPopulation: 150000,
@@ -104,54 +97,262 @@ export default function AlertsPage() {
       },
       {
         id: "ALT-004",
-        title: "Air Quality Index Deterioration",
-        description:
-          "Air quality measurements show significant deterioration in urban areas. Potential respiratory health impacts expected.",
+        title: "Air Quality Index Deterioration in Urban Centers",
+        description: "Air quality measurements show significant deterioration in urban areas (AQI > 150). Potential respiratory health impacts expected.",
         severity: "medium",
         category: "Environmental Health",
         status: "active",
-        createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
-        updatedAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
-        source: "Environmental Monitoring",
+        createdAt: subHours(now, 8),
+        updatedAt: subHours(now, 3),
+        source: "Environmental Monitoring Network",
         location: "Urban Centers",
         affectedPopulation: 1200000,
-        relatedTopics: ["Air Quality", "Respiratory Health", "Environmental"],
+        relatedTopics: ["Air Quality", "Respiratory Health", "Environmental Alerts"],
         actionRequired: false,
       },
       {
         id: "ALT-005",
         title: "Healthcare Worker Burnout Indicators Rising",
-        description:
-          "Analysis of healthcare worker communications shows increasing signs of burnout and stress-related concerns.",
+        description: "Analysis of healthcare worker communications shows increasing signs of burnout and stress-related concerns across several major hospitals.",
         severity: "medium",
         category: "Healthcare Workforce",
         status: "resolved",
-        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 hours ago
-        updatedAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
-        source: "Workforce Analytics",
-        location: "Healthcare Facilities",
+        createdAt: subDays(now, 1),
+        updatedAt: subHours(now, 12),
+        source: "Workforce Analytics Platform",
+        location: "Healthcare Facilities Statewide",
         affectedPopulation: 25000,
-        relatedTopics: ["Healthcare Workers", "Burnout", "Mental Health"],
+        relatedTopics: ["Healthcare Workers", "Burnout", "Mental Health Support", "Staffing"],
         actionRequired: false,
         assignedTo: "HR Department",
       },
       {
         id: "ALT-006",
-        title: "Seasonal Flu Activity Increase",
-        description:
-          "Early indicators suggest above-normal seasonal flu activity. Preparation for increased healthcare demand recommended.",
+        title: "Seasonal Flu Activity Increase - Early Warning",
+        description: "Early indicators from sentinel surveillance suggest above-normal seasonal flu activity. Preparation for increased healthcare demand recommended.",
         severity: "low",
         category: "Disease Surveillance",
         status: "acknowledged",
-        createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
-        updatedAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+        createdAt: subHours(now, 12),
+        updatedAt: subHours(now, 6),
         source: "Disease Surveillance System",
-        location: "Regional",
+        location: "Regional Health District 3",
         affectedPopulation: 500000,
-        relatedTopics: ["Seasonal Flu", "Disease Surveillance", "Healthcare Capacity"],
+        relatedTopics: ["Seasonal Flu", "Disease Surveillance", "Healthcare Capacity", "Vaccination Drive"],
         actionRequired: false,
       },
-    ]
+      {
+        id: "ALT-007",
+        title: "Critical Medical Supply Shortage Reported",
+        description: "Central supply reports critical shortage of N95 masks and specific antiviral medications. Supply chain disruption suspected.",
+        severity: "critical",
+        category: "Supply Chain",
+        status: "active",
+        createdAt: subHours(now, 1),
+        updatedAt: subMinutes(now, 15),
+        source: "Inventory Management System",
+        location: "National Distribution Center",
+        relatedTopics: ["Medical Supplies", "Logistics", "Pandemic Preparedness"],
+        actionRequired: true,
+        assignedTo: "Logistics & Procurement",
+      },
+      {
+        id: "ALT-008",
+        title: "Elevated Water Contamination Levels in County X",
+        description: "Routine water testing in County X indicates E. coli levels exceeding safety thresholds. Boil water advisory being prepared.",
+        severity: "high",
+        category: "Environmental Health",
+        status: "active",
+        createdAt: subHours(now, 3),
+        updatedAt: subHours(now, 1),
+        source: "Water Quality Monitoring",
+        location: "County X",
+        affectedPopulation: 75000,
+        relatedTopics: ["Water Safety", "Public Health Advisory", "E. coli"],
+        actionRequired: true,
+        assignedTo: "County Health Department",
+      },
+      {
+        id: "ALT-009",
+        title: "System Maintenance Notification for EHR",
+        description: "Electronic Health Record system scheduled for maintenance on Sunday 02:00-04:00 AM. Expect brief downtime.",
+        severity: "info",
+        category: "System Notifications",
+        status: "acknowledged",
+        createdAt: subDays(now, 2),
+        updatedAt: subDays(now, 1),
+        source: "IT Department",
+        location: "All Facilities",
+        relatedTopics: ["EHR", "System Maintenance", "IT"],
+        actionRequired: false,
+      },
+      {
+        id: "ALT-010",
+        title: "Unconfirmed Report of Novel Pathogen",
+        description: "Rumor circulating on social media about a new respiratory pathogen with high transmissibility. Awaiting lab verification.",
+        severity: "medium",
+        category: "Emerging Threats",
+        status: "active",
+        createdAt: subHours(now, 5),
+        updatedAt: subHours(now, 1),
+        source: "Social Media Intelligence",
+        location: "Online Forums",
+        relatedTopics: ["Pathogen Surveillance", "Rumor Control", "Epidemiology"],
+        actionRequired: true,
+        assignedTo: "Rapid Response Unit",
+      },
+      {
+        id: "ALT-011",
+        title: "School Absenteeism Spike in District Alpha",
+        description: "School district Alpha reports a 40% increase in student absenteeism due to flu-like symptoms over the past 3 days.",
+        severity: "medium",
+        category: "Disease Surveillance",
+        status: "acknowledged",
+        createdAt: subHours(now, 10),
+        updatedAt: subHours(now, 4),
+        source: "School Health Network",
+        location: "District Alpha",
+        affectedPopulation: 15000,
+        relatedTopics: ["School Health", "Influenza", "Community Spread"],
+        actionRequired: true,
+        assignedTo: "Pediatric Health Unit",
+      },
+      {
+        id: "ALT-012",
+        title: "Resolved: Power Outage at City General Hospital",
+        description: "Power has been restored to City General Hospital. All systems returning to normal operation after a 2-hour outage.",
+        severity: "info",
+        category: "Healthcare Infrastructure",
+        status: "resolved",
+        createdAt: subHours(now, 7),
+        updatedAt: subHours(now, 5),
+        source: "Facilities Management",
+        location: "City General Hospital",
+        relatedTopics: ["Power Outage", "Hospital Operations"],
+        actionRequired: false,
+        assignedTo: "Facilities Team",
+      },
+      {
+        id: "ALT-013",
+        title: "Increase in Heatstroke Cases Reported",
+        description: "Emergency rooms across southern regions report a significant increase in heatstroke and dehydration cases amid heatwave.",
+        severity: "high",
+        category: "Environmental Health",
+        status: "active",
+        createdAt: subHours(now, 9),
+        updatedAt: subHours(now, 2),
+        source: "ER Admission Data",
+        location: "Southern Region",
+        affectedPopulation: 800000,
+        relatedTopics: ["Heatwave", "Public Safety", "Dehydration", "Climate Change"],
+        actionRequired: true,
+        assignedTo: "Public Health Office",
+      },
+      {
+        id: "ALT-014",
+        title: "Dismissed: False Alarm for Chemical Spill",
+        description: "Initial report of a chemical spill near downtown was investigated and found to be a false alarm. No public risk.",
+        severity: "info",
+        category: "Environmental Health",
+        status: "dismissed",
+        createdAt: subDays(now, 3),
+        updatedAt: subDays(now, 2),
+        source: "Emergency Dispatch",
+        location: "Downtown Area",
+        relatedTopics: ["Hazmat", "False Alarm"],
+        actionRequired: false,
+      },
+      {
+        id: "ALT-015",
+        title: "Low Compliance with New Health Guideline",
+        description: "Observation data indicates low public compliance (approx. 30%) with the newly issued mask advisory in public transport.",
+        severity: "medium",
+        category: "Public Health Compliance",
+        status: "active",
+        createdAt: subHours(now, 20),
+        updatedAt: subHours(now, 5),
+        source: "Compliance Monitoring Team",
+        location: "City Transit System",
+        relatedTopics: ["Health Guidelines", "Public Behavior", "Mask Advisory"],
+        actionRequired: true,
+        assignedTo: "Public Awareness Campaign",
+      },
+       {
+        id: "ALT-016",
+        title: "Pharmaceutical Recall: Batch XYZ of Antihypertensive",
+        description: "Manufacturer issued a voluntary recall for batch XYZ of 'CardioSecure' due to potential contamination. Pharmacies notified.",
+        severity: "high",
+        category: "Pharmaceutical Safety",
+        status: "active",
+        createdAt: subHours(now, 18),
+        updatedAt: subHours(now, 3),
+        source: "Regulatory Drug Authority",
+        location: "National",
+        relatedTopics: ["Drug Recall", "Patient Safety", "Pharmacy Network"],
+        actionRequired: true,
+        assignedTo: "Pharmacy Board",
+      },
+      {
+        id: "ALT-017",
+        title: "Potential Cyberattack on Health Data Server",
+        description: "Unusual network activity detected on a server hosting anonymized patient data. Security team investigating potential breach.",
+        severity: "critical",
+        category: "Cybersecurity",
+        status: "active",
+        createdAt: subHours(now, 1),
+        updatedAt: subMinutes(now, 10),
+        source: "Intrusion Detection System",
+        location: "Central Data Center",
+        relatedTopics: ["Data Breach", "Cybersecurity", "Patient Privacy", "HIPAA"],
+        actionRequired: true,
+        assignedTo: "Cybersecurity Incident Response Team",
+      },
+      {
+        id: "ALT-018",
+        title: "Successful Public Vaccination Drive - Phase 1 Complete",
+        description: "Phase 1 of the targeted vaccination drive for high-risk populations has concluded with 85% coverage.",
+        severity: "info",
+        category: "Public Health Campaigns",
+        status: "resolved",
+        createdAt: subDays(now, 7),
+        updatedAt: subDays(now, 1),
+        source: "Vaccination Program Office",
+        location: "Designated Vaccination Centers",
+        relatedTopics: ["Vaccination", "Public Health Success", "Immunization"],
+        actionRequired: false,
+      },
+      {
+        id: "ALT-019",
+        title: "Foodborne Illness Outbreak Suspected at Event",
+        description: "Multiple reports of gastrointestinal illness from attendees of the 'City Fair' event last weekend. Investigating food vendors.",
+        severity: "high",
+        category: "Disease Surveillance",
+        status: "acknowledged",
+        createdAt: subHours(now, 22),
+        updatedAt: subHours(now, 4),
+        source: "Public Complaints Hotline",
+        location: "City Fairgrounds",
+        affectedPopulation: 500, // Estimated attendees with symptoms
+        relatedTopics: ["Food Safety", "Outbreak Investigation", "Gastroenteritis"],
+        actionRequired: true,
+        assignedTo: "Epidemiology Department",
+      },
+      {
+        id: "ALT-020",
+        title: "Blood Supply Levels Low for Type O-Negative",
+        description: "Regional blood banks report critically low levels of O-Negative blood type. Urgent call for donations initiated.",
+        severity: "medium",
+        category: "Supply Chain",
+        status: "active",
+        createdAt: subHours(now, 15),
+        updatedAt: subHours(now, 1),
+        source: "Blood Bank Network",
+        location: "Regional",
+        relatedTopics: ["Blood Donation", "Medical Supplies", "Emergency Preparedness"],
+        actionRequired: true,
+        assignedTo: "Blood Drive Coordination Team",
+      }
+    ];
 
     setAlerts(mockAlerts)
     setFilteredAlerts(mockAlerts)
@@ -239,7 +440,8 @@ export default function AlertsPage() {
     actionRequired: alerts.filter((a) => a.actionRequired).length,
   }
 
-  const categories = [...new Set(alerts.map((alert) => alert.category))]
+  const categories = [...new Set(alerts.map((alert) => alert.category))].sort()
+
 
   return (
     <div className="space-y-6">
@@ -248,12 +450,6 @@ export default function AlertsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Alert Management</h1>
           <p className="text-muted-foreground">Monitor and manage health monitoring alerts and notifications</p>
         </div>
-        {/* Removed Alert Settings Button
-        <Button>
-          <Settings className="h-4 w-4 mr-2" />
-          Alert Settings
-        </Button>
-        */}
       </div>
 
       {/* Alert Statistics */}
@@ -313,7 +509,6 @@ export default function AlertsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Changed md:grid-cols-5 to md:grid-cols-4 */}
           <div className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Search</label>
@@ -374,19 +569,6 @@ export default function AlertsPage() {
                 </SelectContent>
               </Select>
             </div>
-            {/* Removed Actions section
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Actions</label>
-              <div className="flex space-x-2">
-                <Button variant="outline" size="sm">
-                  <Archive className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            */}
           </div>
         </CardContent>
       </Card>
@@ -465,12 +647,6 @@ export default function AlertsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>Alert Details</span>
-                  {/* Removed View Full Button
-                  <Button variant="outline" size="sm">
-                    <Eye className="h-4 w-4 mr-2" />
-                    View Full
-                  </Button>
-                  */}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -538,19 +714,6 @@ export default function AlertsPage() {
                   </div>
                 </div>
 
-                {/* Removed Action Buttons for Alert Details
-                <div className="space-y-2 pt-4 border-t">
-                  <Button className="w-full" size="sm">
-                    Acknowledge Alert
-                  </Button>
-                  <Button variant="outline" className="w-full" size="sm">
-                    Assign to Team
-                  </Button>
-                  <Button variant="outline" className="w-full" size="sm">
-                    Mark as Resolved
-                  </Button>
-                </div>
-                */}
               </CardContent>
             </Card>
           ) : (
