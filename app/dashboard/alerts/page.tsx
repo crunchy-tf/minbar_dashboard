@@ -1,8 +1,9 @@
+// FILE: app/dashboard/alerts/page.tsx
 "use client"
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+// import { Button } from "@/components/ui/button"; // Button import will be removed if no other buttons remain
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -13,10 +14,10 @@ import {
   Clock,
   Filter,
   Search,
-  Eye,
-  Archive,
-  Trash2,
-  Settings,
+  // Eye, // Removed as "View Full" button is removed
+  // Archive, // Removed as Actions buttons are removed
+  // Trash2, // Removed as Actions buttons are removed
+  // Settings, // Removed as "Alert Settings" button is removed
   Users,
   MapPin,
 } from "lucide-react"
@@ -247,10 +248,12 @@ export default function AlertsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Alert Management</h1>
           <p className="text-muted-foreground">Monitor and manage health monitoring alerts and notifications</p>
         </div>
+        {/* Removed Alert Settings Button
         <Button>
           <Settings className="h-4 w-4 mr-2" />
           Alert Settings
         </Button>
+        */}
       </div>
 
       {/* Alert Statistics */}
@@ -310,7 +313,8 @@ export default function AlertsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-5">
+          {/* Changed md:grid-cols-5 to md:grid-cols-4 */}
+          <div className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Search</label>
               <div className="relative">
@@ -370,6 +374,7 @@ export default function AlertsPage() {
                 </SelectContent>
               </Select>
             </div>
+            {/* Removed Actions section
             <div className="space-y-2">
               <label className="text-sm font-medium">Actions</label>
               <div className="flex space-x-2">
@@ -381,6 +386,7 @@ export default function AlertsPage() {
                 </Button>
               </div>
             </div>
+            */}
           </div>
         </CardContent>
       </Card>
@@ -459,10 +465,12 @@ export default function AlertsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>Alert Details</span>
+                  {/* Removed View Full Button
                   <Button variant="outline" size="sm">
                     <Eye className="h-4 w-4 mr-2" />
                     View Full
                   </Button>
+                  */}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -530,6 +538,7 @@ export default function AlertsPage() {
                   </div>
                 </div>
 
+                {/* Removed Action Buttons for Alert Details
                 <div className="space-y-2 pt-4 border-t">
                   <Button className="w-full" size="sm">
                     Acknowledge Alert
@@ -541,6 +550,7 @@ export default function AlertsPage() {
                     Mark as Resolved
                   </Button>
                 </div>
+                */}
               </CardContent>
             </Card>
           ) : (

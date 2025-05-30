@@ -1,14 +1,15 @@
+// FILE: app/dashboard/analysis/page.tsx
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react" // Added useEffect
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DatePickerWithRange } from "@/components/date-range-picker"
-import type { DateRange } from "react-day-picker"
-import { subDays } from "date-fns"
+// import { DatePickerWithRange } from "@/components/date-range-picker" // Removed
+// import type { DateRange } from "react-day-picker" // Removed
+// import { subDays } from "date-fns" // Removed
 import { api } from "@/lib/api"
 import {
   BarChart,
@@ -25,10 +26,15 @@ import {
 } from "recharts"
 
 export default function AnalysisPage() {
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 7),
-    to: new Date(),
-  })
+  // Date state is removed. If you need a default or fixed date range, define it here.
+  // For now, API calls will need to be adjusted if they strictly require date.
+  // Let's assume for now the API calls will use default ranges or you'll adapt them.
+  // If a fixed date range is needed for the API calls, define `defaultStartDate` and `defaultEndDate`
+  const defaultStartDate = new Date()
+  defaultStartDate.setDate(defaultStartDate.getDate() - 7) // Default to 7 days ago
+  const defaultEndDate = new Date()
+
+
   const [signalName, setSignalName] = useState("topic_3_document_count")
   const [analysisType, setAnalysisType] = useState("basicstats")
   const [analysisData, setAnalysisData] = useState<any>(null)
@@ -36,14 +42,14 @@ export default function AnalysisPage() {
   const [error, setError] = useState<string | null>(null)
 
   const runAnalysis = async () => {
-    if (!date?.from || !date?.to) return
-
+    // Removed date?.from || !date?.to check as 'date' state is gone
+    // Use defaultStartDate and defaultEndDate or pass them as needed
     setLoading(true)
     setError(null)
 
     try {
-      const startTime = date.from.toISOString()
-      const endTime = date.to.toISOString()
+      const startTime = defaultStartDate.toISOString()
+      const endTime = defaultEndDate.toISOString()
 
       let data
       switch (analysisType) {
@@ -56,27 +62,34 @@ export default function AnalysisPage() {
         case "zscore":
           data = await api.zScore(signalName, startTime, endTime)
           break
-        case "rateofchange":
-          data = await api.rateOfChange(signalName, startTime, endTime)
-          break
-        case "percentchange":
-          data = await api.percentChange(signalName, startTime, endTime)
-          break
         case "stldecomposition":
           data = await api.stlDecomposition(signalName, startTime, endTime)
           break
         default:
+          if (analysisType === "rateofchange" || analysisType === "percentchange") {
+            throw new Error(`Analysis type "${analysisType}" is no longer supported.`)
+          }
           throw new Error("Unknown analysis type")
       }
 
       setAnalysisData(data)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Analysis failed:", error)
-      setError(error instanceof Error ? error.message : "Analysis failed")
+      if (error instanceof Error) {
+        setError(error.message)
+      } else {
+        setError("An unknown error occurred during analysis.")
+      }
     } finally {
       setLoading(false)
     }
   }
+
+  // Automatically run analysis on initial load or when relevant params change (if desired)
+  // For now, it's only triggered by the button. If date range was dynamic, it would be a dependency.
+  // useEffect(() => {
+  //   runAnalysis();
+  // }, [signalName, analysisType]); // Add other dependencies if they should trigger re-analysis
 
   const renderAnalysisResult = () => {
     if (!analysisData) return null
@@ -164,31 +177,6 @@ export default function AnalysisPage() {
         }
         break
 
-      case "rateofchange":
-      case "percentchange":
-        if (Array.isArray(analysisData)) {
-          const chartData = analysisData.map((point: any) => ({
-            time: new Date(point.timestamp).toLocaleDateString(),
-            value: point.value,
-          }))
-
-          return (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                <Bar
-                  dataKey="value"
-                  fill="#8884d8"
-                  name={analysisType === "rateofchange" ? "Rate of Change" : "Percent Change"}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          )
-        }
-        break
-
       case "stldecomposition":
         if (analysisData.trend && analysisData.seasonal && analysisData.residual) {
           const trendData = analysisData.trend.map((point: any) => ({
@@ -249,10 +237,13 @@ export default function AnalysisPage() {
         break
 
       default:
+        if (analysisType === "rateofchange" || analysisType === "percentchange") {
+          return <div>Analysis type "{analysisType}" is no longer supported for display.</div>
+        }
         return <pre className="text-sm">{JSON.stringify(analysisData, null, 2)}</pre>
     }
 
-    return <div>Analysis result format not supported for visualization</div>
+    return <div>Analysis result format not supported for visualization for type: {analysisType}</div>
   }
 
   return (
@@ -262,7 +253,7 @@ export default function AnalysisPage() {
           <h1 className="text-3xl font-bold tracking-tight">Time Series Analysis</h1>
           <p className="text-muted-foreground">Advanced statistical analysis of health monitoring signals</p>
         </div>
-        <DatePickerWithRange date={date} setDate={setDate} />
+        {/* DatePickerWithRange removed from here */}
       </div>
 
       <Card>
@@ -291,13 +282,13 @@ export default function AnalysisPage() {
                   <SelectItem value="basicstats">Basic Statistics</SelectItem>
                   <SelectItem value="movingaverage">Moving Average</SelectItem>
                   <SelectItem value="zscore">Z-Score</SelectItem>
-                  <SelectItem value="rateofchange">Rate of Change</SelectItem>
-                  <SelectItem value="percentchange">Percent Change</SelectItem>
                   <SelectItem value="stldecomposition">STL Decomposition</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
+          {/* Removed date range picker from configuration area if it was also there */}
+          {/* Original code didn't have it in this specific card, but good to double check */}
           <Button onClick={runAnalysis} disabled={loading}>
             {loading ? "Running Analysis..." : "Run Analysis"}
           </Button>
@@ -405,14 +396,21 @@ export default function AnalysisPage() {
                       </div>
                     )
                   default:
+                    if (analysisType === "rateofchange" || analysisType === "percentchange") {
+                      return (
+                        <div className="p-3 bg-gray-50 dark:bg-gray-950/20 rounded-lg">
+                          <h4 className="font-medium text-gray-900 dark:text-gray-100">Analysis Type Not Displayed</h4>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">
+                            Automated insights for "{analysisType}" are not currently available.
+                          </p>
+                        </div>
+                      )
+                    }
                     return (
                       <div className="p-3 bg-gray-50 dark:bg-gray-950/20 rounded-lg">
                         <h4 className="font-medium text-gray-900 dark:text-gray-100">Analysis Complete</h4>
                         <p className="text-sm text-gray-700 dark:text-gray-300">
-                          {analysisType === "rateofchange" &&
-                            "Rate of change analysis shows the velocity of signal changes over time."}
-                          {analysisType === "percentchange" &&
-                            "Percent change analysis reveals relative growth or decline patterns."}
+                          Review the visualized results above.
                         </p>
                       </div>
                     )

@@ -1,15 +1,16 @@
+// FILE: app/dashboard/insights/page.tsx
 "use client"
 
-import { useState } from "react"
+// import { useState } from "react" // useState is no longer needed for 'date'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+// import { Button } from "@/components/ui/button"; // Button import removed as it's no longer used directly in this component for the removed buttons
 import { Progress } from "@/components/ui/progress"
 import { Brain, Lightbulb, TrendingUp, AlertTriangle, Target, Zap, Users, FileText, Clock, Shield } from "lucide-react"
-import { DatePickerWithRange } from "@/components/date-range-picker"
-import type { DateRange } from "react-day-picker"
-import { subDays } from "date-fns"
+// import { DatePickerWithRange } from "@/components/date-range-picker" // DatePickerWithRange import removed
+// import type { DateRange } from "react-day-picker" // DateRange type import removed
+// import { subDays } from "date-fns" // subDays import removed
 import {
   LineChart,
   Line,
@@ -26,10 +27,10 @@ import {
 } from "recharts"
 
 export default function InsightsPage() {
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 30),
-    to: new Date(),
-  })
+  // const [date, setDate] = useState<DateRange | undefined>({ // 'date' state removed
+  //   from: subDays(new Date(), 30),
+  //   to: new Date(),
+  // });
 
   // Mock insights data
   const keyInsights = [
@@ -140,7 +141,9 @@ export default function InsightsPage() {
           <h1 className="text-3xl font-bold tracking-tight">AI Insights & Analytics</h1>
           <p className="text-muted-foreground">Advanced analysis and predictive insights from health monitoring data</p>
         </div>
+        {/* Removed DatePickerWithRange
         <DatePickerWithRange date={date} setDate={setDate} />
+        */}
       </div>
 
       <Tabs defaultValue="insights" className="space-y-4">
@@ -238,12 +241,14 @@ export default function InsightsPage() {
                     </ul>
                   </div>
 
+                  {/* Removed Buttons
                   <div className="mt-4 flex space-x-2">
                     <Button size="sm">View Details</Button>
                     <Button size="sm" variant="outline">
                       Export Report
                     </Button>
                   </div>
+                  */}
                 </CardContent>
               </Card>
             ))}

@@ -1,3 +1,4 @@
+// FILE: app/dashboard/topics/page.tsx
 "use client"
 
 import { useState } from "react"
@@ -6,12 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TopicsList } from "@/components/dashboard/topics-list"
 import { TopicTrend } from "@/components/dashboard/topic-trend"
 import { InteractiveSentimentAnalysis } from "@/components/dashboard/interactive-sentiment-analysis"
-import { DatePickerWithRange } from "@/components/date-range-picker"
 import type { DateRange } from "react-day-picker"
 import { subDays } from "date-fns"
 
 export default function TopicsPage() {
-  const [date, setDate] = useState<DateRange | undefined>({
+  const [date, setDate] = useState<DateRange | undefined>({ // Keep state for components that might still use it internally
     from: subDays(new Date(), 7),
     to: new Date(),
   })
@@ -24,15 +24,13 @@ export default function TopicsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Topics Analysis</h1>
           <p className="text-muted-foreground">Monitor and analyze health-related topics and trends</p>
         </div>
-        <DatePickerWithRange date={date} setDate={setDate} />
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3"> {/* Changed grid-cols-4 to grid-cols-3 */}
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="trends">Trends</TabsTrigger>
           <TabsTrigger value="sentiment">Sentiment</TabsTrigger>
-          <TabsTrigger value="keywords">Keywords</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -67,23 +65,6 @@ export default function TopicsPage() {
           <InteractiveSentimentAnalysis dateRange={date} />
         </TabsContent>
 
-        <TabsContent value="keywords" className="space-y-4">
-          <div className="grid gap-6 md:grid-cols-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Topic Keywords Analysis</CardTitle>
-                <CardDescription>Keyword analysis for the selected topic</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center text-muted-foreground py-8">
-                  {selectedTopic
-                    ? `Keyword analysis for topic ${selectedTopic} will be displayed here`
-                    : "Select a topic to view keyword analysis"}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
       </Tabs>
     </div>
   )

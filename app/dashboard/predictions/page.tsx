@@ -1,13 +1,23 @@
+// FILE: app/dashboard/predictions/page.tsx
 "use client"
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+// import { Button } from "@/components/ui/button"; // Button import is not needed
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Select imports not needed
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Brain, TrendingUp, TrendingDown, Target, Calendar, AlertTriangle, CheckCircle, Clock } from "lucide-react"
+import { 
+  Brain, 
+  TrendingUp, 
+  TrendingDown, 
+  Target, 
+  // Calendar, // Calendar is not needed
+  AlertTriangle, // AlertTriangle IS needed for stats card
+  CheckCircle, 
+  Clock 
+} from "lucide-react"
 import {
   Line,
   Area,
@@ -40,12 +50,11 @@ interface Prediction {
 }
 
 export default function PredictionsPage() {
-  const [selectedTimeframe, setSelectedTimeframe] = useState<string>("7d")
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  // const [selectedTimeframe, setSelectedTimeframe] = useState<string>("7d"); // Removed
+  // const [selectedCategory, setSelectedCategory] = useState<string>("all"); // Removed
   const [selectedPrediction, setSelectedPrediction] = useState<Prediction | null>(null)
 
-  // Mock predictions data
-  const predictions: Prediction[] = [
+  const allPredictions: Prediction[] = [
     {
       id: "PRED-001",
       title: "Hospital Capacity Strain Forecast",
@@ -137,8 +146,7 @@ export default function PredictionsPage() {
     },
   ]
 
-  const filteredPredictions =
-    selectedCategory === "all" ? predictions : predictions.filter((p) => p.category === selectedCategory)
+  const filteredPredictions = allPredictions;
 
   const getImpactColor = (impact: string) => {
     switch (impact) {
@@ -167,15 +175,12 @@ export default function PredictionsPage() {
   }
 
   const predictionStats = {
-    total: predictions.length,
-    highConfidence: predictions.filter((p) => p.confidence >= 80).length,
-    highImpact: predictions.filter((p) => p.impact === "high").length,
-    avgConfidence: Math.round(predictions.reduce((sum, p) => sum + p.confidence, 0) / predictions.length),
+    total: allPredictions.length,
+    highConfidence: allPredictions.filter((p) => p.confidence >= 80).length,
+    highImpact: allPredictions.filter((p) => p.impact === "high").length,
+    avgConfidence: Math.round(allPredictions.reduce((sum, p) => sum + p.confidence, 0) / (allPredictions.length || 1)),
   }
 
-  const categories = [...new Set(predictions.map((p) => p.category))]
-
-  // Model performance data
   const modelPerformance = [
     { model: "Hospital Capacity", accuracy: 87, precision: 84, recall: 89, f1_score: 86 },
     { model: "Mental Health Trends", accuracy: 73, precision: 76, recall: 71, f1_score: 73 },
@@ -191,31 +196,7 @@ export default function PredictionsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Predictive Analytics</h1>
           <p className="text-muted-foreground">AI-powered forecasting and trend predictions for health monitoring</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={selectedTimeframe} onValueChange={setSelectedTimeframe}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Timeframe" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">7 Days</SelectItem>
-              <SelectItem value="14d">14 Days</SelectItem>
-              <SelectItem value="30d">30 Days</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Removed Select dropdowns for category and timeframe */}
       </div>
 
       {/* Prediction Statistics */}
@@ -245,7 +226,7 @@ export default function PredictionsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <AlertTriangle className="h-4 w-4 text-red-500" />
+              <AlertTriangle className="h-4 w-4 text-red-500" /> {/* This icon is used here */}
               <div>
                 <p className="text-2xl font-bold">{predictionStats.highImpact}</p>
                 <p className="text-xs text-muted-foreground">High Impact</p>
@@ -417,16 +398,7 @@ export default function PredictionsPage() {
                       <p className="text-sm text-muted-foreground">{selectedPrediction.description}</p>
                     </div>
 
-                    <div className="space-y-2 pt-4 border-t">
-                      <Button className="w-full" size="sm">
-                        <AlertTriangle className="h-4 w-4 mr-2" />
-                        Create Alert
-                      </Button>
-                      <Button variant="outline" className="w-full" size="sm">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        Schedule Review
-                      </Button>
-                    </div>
+                    {/* Removed Create Alert and Schedule Review buttons */}
                   </CardContent>
                 </Card>
               ) : (

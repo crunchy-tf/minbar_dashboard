@@ -1,19 +1,31 @@
+// FILE: app/dashboard/reports/page.tsx
 "use client"
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+// import { Button } from "@/components/ui/button"; // Will be removed if no other buttons remain
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
+// import { Input } from "@/components/ui/input"; // No longer needed for Generate tab
+// import { Label } from "@/components/ui/label"; // No longer needed for Generate tab
+// import { Textarea } from "@/components/ui/textarea"; // No longer needed for Generate tab
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // No longer needed for Generate tab
+// import { Checkbox } from "@/components/ui/checkbox"; // No longer needed for Generate tab
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DatePickerWithRange } from "@/components/date-range-picker"
-import type { DateRange } from "react-day-picker"
-import { subDays, format } from "date-fns"
-import { FileText, Download, Share, Clock, Users, CheckCircle, Eye, Edit, Plus } from "lucide-react"
+// import { DatePickerWithRange } from "@/components/date-range-picker"; // No longer needed for Generate tab
+// import type { DateRange } from "react-day-picker"; // No longer needed for Generate tab
+// import { subDays, format } from "date-fns"; // subDays no longer needed
+import { format } from "date-fns"; // format is still used
+import { 
+  FileText, 
+  Download, 
+  Share, 
+  Clock, 
+  Users, 
+  CheckCircle, 
+  Eye, 
+  // Edit, // No longer needed for Edit Report button
+  // Plus // No longer needed for New Report button
+} from "lucide-react"
 
 interface Report {
   id: string
@@ -32,12 +44,13 @@ interface Report {
 
 export default function ReportsPage() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null)
-  const [reportType, setReportType] = useState<string>("executive")
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 7),
-    to: new Date(),
-  })
-  const [selectedSections, setSelectedSections] = useState<string[]>([])
+  // State related to generating reports is no longer needed
+  // const [reportType, setReportType] = useState<string>("executive")
+  // const [dateRange, setDateRange] = useState<DateRange | undefined>({
+  //   from: subDays(new Date(), 7),
+  //   to: new Date(),
+  // })
+  // const [selectedSections, setSelectedSections] = useState<string[]>([])
 
   // Mock reports data
   const reports: Report[] = [
@@ -99,47 +112,9 @@ export default function ReportsPage() {
     },
   ]
 
-  const availableSections = [
-    "Executive Summary",
-    "Key Metrics",
-    "Topic Analysis",
-    "Sentiment Trends",
-    "Geographic Analysis",
-    "Alert Summary",
-    "Predictive Insights",
-    "Risk Assessment",
-    "Recommendations",
-    "Data Sources",
-    "Methodology",
-    "Appendices",
-  ]
-
-  const reportTemplates = [
-    {
-      name: "Executive Dashboard",
-      description: "High-level overview for leadership",
-      sections: ["Executive Summary", "Key Metrics", "Alert Summary", "Recommendations"],
-      type: "executive",
-    },
-    {
-      name: "Technical Analysis",
-      description: "Detailed technical analysis and methodology",
-      sections: ["Data Sources", "Methodology", "Topic Analysis", "Predictive Insights", "Appendices"],
-      type: "technical",
-    },
-    {
-      name: "Public Health Brief",
-      description: "Public-facing health status update",
-      sections: ["Executive Summary", "Key Metrics", "Recommendations"],
-      type: "public",
-    },
-    {
-      name: "Regulatory Submission",
-      description: "Compliance and regulatory reporting",
-      sections: ["Executive Summary", "Data Sources", "Methodology", "Risk Assessment", "Appendices"],
-      type: "regulatory",
-    },
-  ]
+  // availableSections and reportTemplates are no longer needed as Generate/Templates tabs are removed
+  // const availableSections = [...]
+  // const reportTemplates = [...]
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -150,7 +125,7 @@ export default function ReportsPage() {
       case "scheduled":
         return "default"
       case "archived":
-        return "secondary"
+        return "secondary" // Consider if 'archived' should have a different color
       default:
         return "outline"
     }
@@ -183,12 +158,14 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Reports & Analytics</h1>
-          <p className="text-muted-foreground">Generate, manage, and distribute health monitoring reports</p>
+          <p className="text-muted-foreground">Browse and manage health monitoring reports</p> {/* Updated description */}
         </div>
+        {/* Removed New Report Button 
         <Button>
           <Plus className="h-4 w-4 mr-2" />
           New Report
         </Button>
+        */}
       </div>
 
       {/* Report Statistics */}
@@ -218,7 +195,7 @@ export default function ReportsPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <Edit className="h-4 w-4 text-orange-500" />
+              <FileText className="h-4 w-4 text-orange-500" /> {/* Changed icon from Edit to FileText for drafts */}
               <div>
                 <p className="text-2xl font-bold">{reportStats.drafts}</p>
                 <p className="text-xs text-muted-foreground">Drafts</p>
@@ -239,14 +216,14 @@ export default function ReportsPage() {
         </Card>
       </div>
 
-      <Tabs defaultValue="existing" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="existing">Existing Reports</TabsTrigger>
-          <TabsTrigger value="generate">Generate Report</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
+      <Tabs defaultValue="browse" className="space-y-4"> {/* Changed defaultValue */}
+        {/* Changed grid-cols-3 to grid-cols-1 */}
+        <TabsList className="grid w-full grid-cols-1">
+          <TabsTrigger value="browse">Browse Reports</TabsTrigger> {/* Renamed and only tab now */}
+          {/* Removed TabsTrigger for "generate" and "templates" */}
         </TabsList>
 
-        <TabsContent value="existing" className="space-y-6">
+        <TabsContent value="browse" className="space-y-6"> {/* Changed value to "browse" */}
           <div className="grid gap-6 md:grid-cols-3">
             {/* Reports List */}
             <div className="md:col-span-2 space-y-4">
@@ -264,16 +241,11 @@ export default function ReportsPage() {
                         <Badge variant={getTypeColor(report.type)}>{report.type}</Badge>
                         <Badge variant={getStatusColor(report.status)}>{report.status}</Badge>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Share className="h-4 w-4" />
-                        </Button>
+                      {/* Keeping View and Download for list items, Share can be optional */}
+                      <div className="flex items-center space-x-2"> 
+                        <Eye className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); /* Implement view logic or select */ setSelectedReport(report); }} />
+                        <Download className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); alert(`Downloading ${report.title}`); }}/>
+                        <Share className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); alert(`Sharing ${report.title}`); }}/>
                       </div>
                     </div>
 
@@ -360,6 +332,7 @@ export default function ReportsPage() {
                       </div>
                     </div>
 
+                    {/* Removed action buttons from details panel
                     <div className="space-y-2 pt-4 border-t">
                       <Button className="w-full" size="sm">
                         <Download className="h-4 w-4 mr-2" />
@@ -374,6 +347,7 @@ export default function ReportsPage() {
                         Edit Report
                       </Button>
                     </div>
+                    */}
                   </CardContent>
                 </Card>
               ) : (
@@ -389,113 +363,8 @@ export default function ReportsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="generate" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Generate New Report</CardTitle>
-              <CardDescription>Create a custom health monitoring report</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="report-title">Report Title</Label>
-                    <Input id="report-title" placeholder="Enter report title..." />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="report-description">Description</Label>
-                    <Textarea id="report-description" placeholder="Brief description of the report..." />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="report-type">Report Type</Label>
-                    <Select value={reportType} onValueChange={setReportType}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select report type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="executive">Executive Summary</SelectItem>
-                        <SelectItem value="technical">Technical Analysis</SelectItem>
-                        <SelectItem value="public">Public Health Brief</SelectItem>
-                        <SelectItem value="regulatory">Regulatory Report</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Date Range</Label>
-                    <DatePickerWithRange date={dateRange} setDate={setDateRange} />
-                  </div>
-                </div>
+        {/* Removed TabsContent for "generate" and "templates" */}
 
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Report Sections</Label>
-                    <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
-                      {availableSections.map((section) => (
-                        <div key={section} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={section}
-                            checked={selectedSections.includes(section)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setSelectedSections([...selectedSections, section])
-                              } else {
-                                setSelectedSections(selectedSections.filter((s) => s !== section))
-                              }
-                            }}
-                          />
-                          <Label htmlFor={section} className="text-sm">
-                            {section}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center pt-6 border-t">
-                <div className="text-sm text-muted-foreground">{selectedSections.length} sections selected</div>
-                <div className="space-x-2">
-                  <Button variant="outline">Save as Draft</Button>
-                  <Button>Generate Report</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="templates" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            {reportTemplates.map((template, index) => (
-              <Card key={index} className="hover:shadow-md transition-all cursor-pointer">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{template.name}</CardTitle>
-                    <Badge variant={getTypeColor(template.type)}>{template.type}</Badge>
-                  </div>
-                  <CardDescription>{template.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <h5 className="text-sm font-medium mb-2">Included Sections:</h5>
-                      <div className="space-y-1">
-                        {template.sections.map((section, idx) => (
-                          <div key={idx} className="text-sm text-muted-foreground">
-                            • {section}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <Button className="w-full" variant="outline">
-                      Use Template
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
       </Tabs>
     </div>
   )
